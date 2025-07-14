@@ -1,5 +1,7 @@
-// Step 1: Member Class
-class Member {
+// #TASK-1 Hospital Management System
+
+// Step 1: Base User Class
+class User {
     #email;
     #id;
 
@@ -21,113 +23,118 @@ class Member {
         if (email.includes("@")) {
             this.#email = email;
         } else {
-            this.#email = "example@university.com";
+            this.#email = "example@gmail.com";
             console.log("Invalid email");
         }
     }
 
     performTask() {
-        console.log("Member performing general task");
+        console.log("User performing general task");
     }
 }
 
-// Step 2: Professor Class
-class Professor extends Member {
-    constructor(name, id, email, department) {
-        super(name, id, email);
-        this.department = department;
-        this.courses = [];
-    }
-
-    addCourse(courseName) {
-        this.courses.push(courseName);
-        console.log(`Professor ${this.name} added course: ${courseName}`);
-    }
-
-    viewCourses() {
-        console.log(`Courses taught by Professor ${this.name}:`);
-        this.courses.forEach((c, i) => console.log(`${i + 1}. ${c}`));
-    }
-
-    performTask() {
-        console.log(`Professor ${this.name} is preparing and teaching courses`);
-    }
-}
-
-// Step 3: Student Class
-class Student extends Member {
-    constructor(name, id, email, major) {
-        super(name, id, email);
-        this.major = major;
-        this.enrolledCourses = [];
-    }
-
-    enroll(courseName) {
-        this.enrolledCourses.push(courseName);
-        console.log(`${this.name} enrolled in: ${courseName}`);
-    }
-
-    viewCourses() {
-        console.log(`Courses enrolled by ${this.name}:`);
-        this.enrolledCourses.forEach((c, i) => console.log(`${i + 1}. ${c}`));
-    }
-
-    performTask() {
-        console.log(`${this.name} is studying and attending classes`);
-    }
-}
-
-// Step 4: Admin Class
-class Admin extends Member {
+// Step 2: Admin Class
+class Admin extends User {
     constructor(name, id, email) {
         super(name, id, email);
-        this.members = [];
+        this.users = [];
     }
 
-    addMember(member) {
-        this.members.push(member);
-        console.log(`Admin ${this.name} added member: ${member.name}`);
+    addUser(user) {
+        this.users.push(user);
+        console.log(`Admin ${this.name} added user ${user.name}`);
     }
 
-    removeMember(memberId) {
-        this.members = this.members.filter(m => m.id !== memberId);
-        console.log(`Admin ${this.name} removed member with ID: ${memberId}`);
+    removeUser(userEmail) {
+        this.users = this.users.filter(
+            (user) => user.email != userEmail
+        );
+        console.log("User removed");
     }
 
-    listMembers() {
-        console.log(`Members managed by Admin ${this.name}:`);
-        this.members.forEach(m => console.log(`- ${m.name} (${m.email})`));
+    listUsers() {
+        console.log(`Users managed by Admin ${this.name}:`);
+        this.users.forEach(user => console.log(`- ${user.name} (${user.email})`));
     }
 
     performTask() {
-        console.log(`Admin ${this.name} is managing university records`);
+        console.log(`Admin ${this.name} is managing users`);
+    }
+}
+
+// Step 3: Doctor Class
+class Doctor extends User {
+    constructor(name, id, email, specialty) {
+        super(name, id, email);
+        this.specialty = specialty;
+        this.diagnosedPatients = [];
+    }
+
+    diagnose(patientName, disease) {
+        this.diagnosedPatients.push({ patientName, disease });
+        console.log(`Dr. ${this.name} diagnosed ${patientName} with ${disease}`);
+    }
+
+    listDiagnosedPatients() {
+        console.log(`Diagnosed patients by Dr. ${this.name}:`);
+        this.diagnosedPatients.forEach((p, i) => {
+            console.log(`${i + 1}. ${p.patientName} - ${p.disease}`);
+        });
+    }
+
+    performTask() {
+        console.log(`Dr. ${this.name} is diagnosing patients`);
+    }
+}
+
+// Step 4: Patient Class
+class Patient extends User {
+    constructor(name, id, email) {
+        super(name, id, email);
+        this.appointments = [];
+    }
+
+    bookAppointment(doctor, date) {
+        this.appointments.push({ doctor: doctor.name, date });
+        console.log(`${this.name} booked an appointment with Dr. ${doctor.name} on ${date}`);
+    }
+
+    viewAppointments() {
+        console.log(`Appointments for ${this.name}:`);
+        this.appointments.forEach((a, i) => {
+            console.log(`${i + 1}. Dr. ${a.doctor} on ${a.date}`);
+        });
+    }
+
+    performTask() {
+        console.log(`${this.name} is booking appointments`);
     }
 }
 
 // Step 5: Create and Use Objects
-const admin1 = new Admin("Dr. mohamed", 1, "admin@university.com");
-const prof1 = new Professor("Dr. ali", 2, "ali@cs.edu", "Computer Science");
-const student1 = new Student("ahmed", 3, "ahmed@student.edu", "front end developer");
+const admin1 = new Admin("mohamed", 1, "admin@hospital.com");
+const doctor1 = new Doctor("Dr. ali", 2, "ali@clinic.com", "Cardiology");
+const patient1 = new Patient("ahmed", 3, "ahmed@mail.com");
 
-admin1.addMember(prof1);
-admin1.addMember(student1);
+admin1.addUser(doctor1);
+admin1.addUser(patient1);
 
-prof1.addCourse("Data Structures");
-prof1.addCourse("Algorithms");
+doctor1.diagnose("ahmed", "High Blood Pressure");
+patient1.bookAppointment(doctor1, "2025-07-22");
 
-student1.enroll("Data Structures");
-student1.enroll("object orinted programming");
-
-const allMembers = [admin1, prof1, student1];
+const allUsers = [admin1, doctor1, patient1];
 
 console.log("\n--- Performing Tasks ---");
-allMembers.forEach(m => m.performTask());
+allUsers.forEach(user => user.performTask());
 
-console.log("\n--- Admin Members ---");
-admin1.listMembers();
+console.log("\n--- Admin's Managed Users ---");
+admin1.listUsers();
 
-console.log("\n--- Professor Courses ---");
-prof1.viewCourses();
+console.log("\n--- Diagnosed Patients ---");
+doctor1.listDiagnosedPatients();
 
-console.log("\n--- Student Enrollments ---");
-student1.viewCourses();
+console.log("\n--- Patient Appointments ---");
+patient1.viewAppointments();
+
+
+
